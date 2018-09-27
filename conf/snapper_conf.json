@@ -1,0 +1,46 @@
+{
+    "snapper_configuration": {
+        "repositories":[
+            {
+                "name":"repository_example",
+                "path":"/var/snapper/example",
+                "snapshot_levels":[
+                    {
+                        "name":"LongTerm",
+                        "frequency":24,
+                        "unit":"hour",
+                        "link":"/var/snapper/example/LongTerm"
+                    },
+                    {
+                        "name":"MedTerm",
+                        "frequency":1,
+                        "unit":"hour",
+                        "link":"/var/snapper/example/MedTerm"
+                    },
+                    {
+                        "name":"ShortTerm",
+                        "frequency":10,
+                        "unit":"min",
+                        "link":"/var/snapper/example/ShortTerm"
+                    }
+                ]
+            },
+            {
+                "name":"single_snapshot_configuration",
+                "path":"/var/snapper/example_single",
+                "snapshot_levels":[
+                    {
+                        "name":"LongTerm",
+                        "frequency":24,
+                        "unit":"hour",
+                        "link":"/var/snapper/example_single/LongTerm"
+                    }
+                ]
+            }
+        ],
+        "stoppers":[
+            "/var/log/conf_snapper/snapper_stopper_single_snapshot_configuration.txt",
+            "/var/log/conf_snapper/snapper_stopper_repository_example.txt"
+        ]
+    }
+}

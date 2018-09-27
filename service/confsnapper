@@ -1,0 +1,98 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          confsnapper
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop confsnapper
+### END INIT INFO
+
+## Daemon script
+
+export SVCNAME=confsnapper
+SVCDESC="confsnapper"
+SVCPROG=/opt/conf_snapper/curr/src/conf_snapper.py
+export PIDDIR=/var/run
+PIDFILE=$PIDDIR/$SVCNAME.pid
+
+. /lib/lsb/init-functions
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+assert_root () {
+    if [[ $EUID -ne 0 ]]; then
+        echo "This script must be run as root" 1>&2
+        exit 1
+    fi
+}
+
+assert_is_off () {
+    $0 status 2>&1 > /dev/null
+    if [ $? == 0 ]; then
+        log_daemon_msg "Already running: $SVCNAME"
+        exit 1
+    fi
+    return 0
+}
+
+START_CMD="$START_CMD start-stop-daemon --start --quiet --oknodo --background"
+START_CMD="$START_CMD --pidfile $PIDFILE --make-pidfile --exec $SVCPROG"
+STOP_CMD="start-stop-daemon --stop --quiet --retry 30 --pidfile $PIDFILE"
+
+case "$1" in
+  start)
+	assert_root
+	assert_is_off
+	log_daemon_msg "Starting $SVCNAME"
+	echo $START_CMD
+	$START_CMD
+	if [ $? == 0 ]; then
+		log_daemon_msg "$SVCNAME started successfully."
+		log_end_msg 0
+	else
+		log_daemon_msg "FAILED to start $SVCNAME."
+		log_end_msg 1
+	fi
+	;;
+  stop)
+	assert_root
+	log_daemon_msg "Stopping $SVCNAME"
+	$STOP_CMD
+	if [ $? == 0 ]; then
+		rm -f $PIDFILE
+		log_daemon_msg "$SVCNAME stopped successfully"
+		log_end_msg 0
+	else
+		log_daemon_msg "FAILED to stop $SVCNAME."
+		log_end_msg 1
+	fi
+	;;
+
+  restart)
+	assert_root
+	log_daemon_msg "Restarting $SVCNAME" "$SVCNAME"
+	$STOP_CMD
+	assert_is_off
+	$START_CMD
+	if [ $? == 0 ]; then
+		log_daemon_msg "$SVCNAME restarted successfully." "$SVCNAME"
+		log_end_msg 0
+	else
+		log_daemon_msg "FAILED to restart $SVCNAME." "$SVCNAME"
+		log_end_msg 1
+	fi
+	;;
+
+  status)
+	echo "status_of_proc -p --pidfile $PIDFILE $SVCPROG $SVCNAME"
+	status_of_proc -p $PIDFILE $SVCPROG $SVCNAME && exit 0 || exit $?
+	;;
+
+  *)
+	log_action_msg "Usage: /etc/init.d/$SVCNAME {start|stop|restart|status}"
+	exit 1
+esac
+
+exit 0
+
