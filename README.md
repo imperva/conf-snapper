@@ -1,6 +1,6 @@
 # Configuration snapper 
 
-Configuration Snapper is a simple tool for managing configuration snapshot files. The tool is available for the Ubuntu Linus distribution, and intended for use with repositories that are based on [Btrfs](https://en.wikipedia.org/wiki/Btrfs).
+Configuration Snapper is a simple tool for managing configuration snapshot files. The tool is available for the Ubuntu Linux distribution, and intended for use with repositories that are based on [Btrfs](https://en.wikipedia.org/wiki/Btrfs).
 Snapshots are managed with cron scheduling. Two snapshots are maintained for each repository for each point in time at which a snapshot is taken. The active link location you define in the Configuration Snapper's configuration file always points to the most recent snapshot and is the location that should be used by your application.
 
 You can add configuration stoppers to instruct the Configuration Snapper service to stop taking snapshots.
